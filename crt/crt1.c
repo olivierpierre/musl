@@ -1,4 +1,5 @@
 #include <features.h>
+#include <syscall.h>
 
 #define START "_start"
 
@@ -10,8 +11,11 @@ void _fini() __attribute__((weak));
 _Noreturn int __libc_start_main(int (*)(), int, char **,
 	void (*)(), void(*)(), void(*)());
 
+void *libc_heap_start;
+
 void _start_c(long *p)
 {
+	libc_heap_start = (void *)syscall(SYS_brk, 0);
 	int argc = p[0];
 	char **argv = (void *)(p+1);
 	__libc_start_main(main, argc, argv, _init, _fini, 0);
